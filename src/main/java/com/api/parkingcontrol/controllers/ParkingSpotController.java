@@ -3,6 +3,8 @@ package com.api.parkingcontrol.controllers;
 import com.api.parkingcontrol.dtos.ParkingSpotDto;
 import com.api.parkingcontrol.models.ParkingSpotModel;
 import com.api.parkingcontrol.services.ParkingSpotService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,12 +25,14 @@ import java.util.UUID;
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/parking-spot")
+@Api(value="API REST Parking Control")
 public class ParkingSpotController {
 
     @Autowired
     ParkingSpotService parkingSpotService;
 
     @PostMapping
+    @ApiOperation(value="Salva uma vaga")
     public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDto parkingSpotDto){
         if(parkingSpotService.existsByLicensePlateCar(parkingSpotDto.getLicensePlateCar())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflit: License Plate Car is already in use!");
@@ -48,11 +52,13 @@ public class ParkingSpotController {
     }
 
     @GetMapping
+    @ApiOperation(value="Retorna todas as vagas")
     public ResponseEntity<Page<ParkingSpotModel>> getAllParkingSpot(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.findAll(pageable));
     }
 
     @GetMapping("/{id}")
+    @ApiOperation(value="Retorna uma unica vaga")
     public ResponseEntity<Object> getOneParkingSpot(@PathVariable(value = "id") UUID id){
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findByid(id);
         if (!parkingSpotModelOptional.isPresent()) {
@@ -62,6 +68,7 @@ public class ParkingSpotController {
     }
 
     @DeleteMapping("/{id}")
+    @ApiOperation(value="Deleta uma vaga")
     public ResponseEntity<Object> deleteParkingSpot(@PathVariable(value = "id") UUID id) {
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findByid(id);
         if(!parkingSpotModelOptional.isPresent()) {
@@ -72,6 +79,7 @@ public class ParkingSpotController {
     }
 
     @PutMapping("/{id}")
+    @ApiOperation(value="Atualiza uma vaga")
     public ResponseEntity<Object> updateParkingSpot(@PathVariable(value = "id") UUID id,
                                                     @RequestBody @Valid ParkingSpotDto parkingSpotDto) {
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findByid(id);
