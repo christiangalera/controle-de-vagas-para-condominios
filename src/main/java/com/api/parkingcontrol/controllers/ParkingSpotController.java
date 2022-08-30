@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -31,6 +32,7 @@ public class ParkingSpotController {
     @Autowired
     ParkingSpotService parkingSpotService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     @ApiOperation(value="Salva uma vaga")
     public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDto parkingSpotDto){
@@ -51,12 +53,14 @@ public class ParkingSpotController {
 
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping
     @ApiOperation(value="Retorna todas as vagas")
     public ResponseEntity<Page<ParkingSpotModel>> getAllParkingSpot(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.findAll(pageable));
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/{id}")
     @ApiOperation(value="Retorna uma unica vaga")
     public ResponseEntity<Object> getOneParkingSpot(@PathVariable(value = "id") UUID id){
@@ -67,6 +71,7 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.OK).body(parkingSpotModelOptional.get());
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ApiOperation(value="Deleta uma vaga")
     public ResponseEntity<Object> deleteParkingSpot(@PathVariable(value = "id") UUID id) {
@@ -78,6 +83,7 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.OK).body("Parking Spot deleted successfully.");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     @ApiOperation(value="Atualiza uma vaga")
     public ResponseEntity<Object> updateParkingSpot(@PathVariable(value = "id") UUID id,
